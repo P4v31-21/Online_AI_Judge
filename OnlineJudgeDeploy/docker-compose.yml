@@ -1,0 +1,76 @@
+version: "3"
+services:
+
+  oj-nginx:
+    image: nginx:1.25-alpine
+    restart: always
+    depends_on:
+      - oj-backend
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "0.0.0.0:80:80"
+
+  oj-redis:
+    image: redis:4.0-alpine
+    restart: always
+    volumes:
+      - ./data/redis:/data
+
+  oj-postgres:
+    image: postgres:10-alpine
+    restart: always
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=onlinejudge
+      - POSTGRES_USER=onlinejudge
+      - POSTGRES_PASSWORD=onlinejudge
+
+  oj-judge:
+    image: registry.cn-hongkong.aliyuncs.com/oj-image/judge:1.6.1
+    restart: always
+    read_only: true
+    cap_drop:
+      - SETPCAP
+      - MKNOD
+      - NET_BIND_SERVICE
+      - SYS_CHROOT
+      - SETFCAP
+      - FSETID
+    tmpfs:
+      - /tmp
+    volumes:
+      - ./data/backend/test_case:/test_case:ro
+      - ./data/judge_server/log:/log
+      - ./data/judge_server/run:/judger
+    environment:
+      - SERVICE_URL=http://oj-judge:8080
+      - BACKEND_URL=http://oj-backend:8000/api/judge_server_heartbeat/
+      - TOKEN=${JUDGE_SERVER_TOKEN}
+
+  oj-backend:
+    image: oj-backend:custom
+    restart: always
+    depends_on:
+      - oj-redis
+      - oj-postgres
+      - oj-judge
+    volumes:
+      - ./data/backend:/data
+      - ./OnlineJudgeFE/dist:/app/dist
+      - ../backend_src/submission/views/oj.py:/app/submission/views/oj.py:ro
+      - ../backend_src/submission/views/admin.py:/app/submission/views/admin.py:ro
+      - ../backend_src/submission/urls/oj.py:/app/submission/urls/oj.py:ro
+      - ../backend_src/submission/urls/admin.py:/app/submission/urls/admin.py:ro
+      - ../backend_src/submission/models.py:/app/submission/models.py:ro
+      - ../backend_src/submission/serializers.py:/app/submission/serializers.py:ro
+    environment:
+      - POSTGRES_DB=onlinejudge
+      - POSTGRES_USER=onlinejudge
+      - POSTGRES_PASSWORD=onlinejudge
+      - JUDGE_SERVER_TOKEN=${JUDGE_SERVER_TOKEN}
+      - AI_API_KEY=${AI_API_KEY}
+    ports:
+      - "127.0.0.1:8000:8000"
+      - "127.0.0.1:1443:1443"

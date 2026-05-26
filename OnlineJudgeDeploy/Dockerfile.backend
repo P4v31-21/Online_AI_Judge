@@ -1,0 +1,8 @@
+FROM registry.cn-hongkong.aliyuncs.com/oj-image/backend:1.6.1
+
+# 复制修复后的代码到容器中
+COPY ./backend_src/problem/views/admin.py /app/problem/views/admin.py
+COPY ./backend_src/problem/tests.py /app/problem/tests.py
+
+# 确保代码正确就位
+RUN ls -la /app/problem/views/admin.py && ls -la /app/problem/tests.py

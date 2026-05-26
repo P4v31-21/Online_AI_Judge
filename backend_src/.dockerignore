@@ -1,0 +1,11 @@
+venv
+.idea
+.git
+.DS_Store
+data
+backend_volume
+.logs
+local_db.sqlite3
+*.tar
+__pycache__
+*.pyc
