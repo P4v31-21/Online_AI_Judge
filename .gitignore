@@ -1,0 +1,6 @@
+.dev_runtime/
+*.log
+.env
+__pycache__/
+node_modules/
+
