@@ -109,7 +109,7 @@ class AISaveProblemSerializer(serializers.Serializer):
     languages = LanguageNameMultiChoiceField()
     template = serializers.DictField(child=serializers.CharField(min_length=1), required=False, default=dict)
     rule_type = serializers.ChoiceField(choices=[ProblemRuleType.ACM, ProblemRuleType.OI], required=False,
-                                        default=ProblemRuleType.ACM)
+                                        default=ProblemRuleType.OI)
     io_mode = ProblemIOModeSerializer(required=False)
     visible = serializers.BooleanField(required=False, default=False)
     difficulty = serializers.ChoiceField(choices=Difficulty.choices(), required=False, default=Difficulty.MID)
