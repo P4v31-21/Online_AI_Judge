@@ -674,7 +674,7 @@ class FPSProblemImport(CSRFExemptAPIView):
                                memory_limit=problem_data["memory_limit"]["value"],
                                samples=problem_data["samples"],
                                template=template,
-                               rule_type=ProblemRuleType.ACM,
+                               rule_type=ProblemRuleType.OI,
                                source=problem_data.get("source", ""),
                                spj=spj,
                                spj_code=problem_data["spj"]["code"] if spj else None,
